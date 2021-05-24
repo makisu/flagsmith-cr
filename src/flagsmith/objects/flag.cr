@@ -3,7 +3,7 @@ class Flagsmith::Flag
 
   getter id : Int32
   getter feature : Flagsmith::FeatureFlag
-  getter feature_state_value : String?
+  getter feature_state_value : String? | Int32?
   getter enabled : Bool
   getter environment : Int32
   getter identity : String?

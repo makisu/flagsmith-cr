@@ -49,7 +49,6 @@ class Flagsmith
       res = Flagsmith.client.get("/api/v1/flags/identities/?identifier=#{user_id}")
       flags = Array(Flag).from_json(res.body)
       flags_to_hash(flags)
-      # puts flags.inspect
     end
   end
 
@@ -73,7 +72,7 @@ class Flagsmith
     res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
 
     traits = Flag::FlagList::Trait.from_json(res.body).traits
-    # puts traits.class
+    # puts traits
     traits_to_hash(traits)
   end
   
@@ -99,8 +98,6 @@ class Flagsmith
   def self.flags_to_hash(flags)
     result = {} of String => Flagsmith::Flag
     flags.each do |flag|
-      # key = normalize_key(flag.delete(:name))
-      # puts flag.feature.name
       result[flag.feature.name] = flag
     end
     result
@@ -109,7 +106,7 @@ class Flagsmith
   def self.traits_to_hash(traits)
     result = {} of String => Flagsmith::Trait
     traits.each do |trait|
-      result["traits"] = trait
+      result[trait.trait_key] = trait
     end
     result
   end
@@ -123,8 +120,6 @@ class Flagsmith
   #   result
   # end
 end
-
-
 
 # not needed
   # def self.transform_flags(flags)

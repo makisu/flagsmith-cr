@@ -6,7 +6,7 @@ class Flagsmith::Flag
   getter feature_state_value : String? | Int32?
   getter enabled : Bool
   getter environment : Int32
-  getter identity : String?
+  getter identity : Int32?
   getter feature_segment : String?
 end
 

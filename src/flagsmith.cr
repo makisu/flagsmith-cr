@@ -72,7 +72,6 @@ class Flagsmith
     res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
 
     traits = Flag::FlagList::Trait.from_json(res.body).traits
-    # puts traits
     traits_to_hash(traits)
   end
   
@@ -88,7 +87,7 @@ class Flagsmith
     key_name = normalize_key(key)
     flag = get_flags(user_id)[key_name]
     return default if flag.nil?
-    puts flag.feature_state_value
+    flag.feature_state_value
   end
   
   def self.normalize_key(key)

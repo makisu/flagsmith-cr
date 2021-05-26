@@ -1,33 +1,28 @@
 {
   "flags": [
-    {
-      "id": 48710,
-      "feature": {
-        "id": 9334,
-        "name": "signup_fields",
-        "created_date": "2021-05-21T07:58:05.034759Z",
-        "description": null,
-        "initial_value": null,
-        "default_enabled": false,
-        "type": "MULTIVARIATE"
-      },
-      "feature_state_value": "name",
-      "enabled": true,
-      "environment": 7770,
-      "identity": 11805396,
-      "feature_segment": null
-    }
+      {
+          "id": 48289,
+          "feature": {
+              "id": 9334,
+              "name": "signup_fields",
+              "created_date": "2021-05-21T07:58:05.034759Z",
+              "description": null,
+              "initial_value": null,
+              "default_enabled": false,
+              "type": "MULTIVARIATE"
+          },
+          "feature_state_value": "name",
+          "enabled": true,
+          "environment": 7770,
+          "identity": null,
+          "feature_segment": null
+      }
   ],
   "traits": [
-    {
-      "id": 9759231,
-      "trait_key": "id",
-      "trait_value": 1
-    },
-    {
-      "id": 9760356,
-      "trait_key": "identifier",
-      "trait_value": 30
-    }
+      {
+          "id": 10089618,
+          "trait_key": "font",
+          "trait_value": "arial"
+      }
   ]
 }

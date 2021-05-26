@@ -3,5 +3,5 @@ class Flagsmith::Trait
 
   getter id : Int32
   getter trait_key : String
-  getter trait_value : Int32
+  getter trait_value : String | Int32 | Bool
 end

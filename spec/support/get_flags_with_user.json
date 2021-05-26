@@ -20,9 +20,9 @@
   ],
   "traits": [
       {
-          "id": 10058951,
-          "trait_key": "testtest",
-          "trait_value": 123
+          "id": 10089618,
+          "trait_key": "font",
+          "trait_value": "arial"
       }
   ]
 }

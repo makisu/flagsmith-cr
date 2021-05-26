@@ -41,7 +41,6 @@ class Flagsmith
   def self.get_flags(user_id = nil) : Hash(String, Flagsmith::Flag)
     if user_id.nil?
       res = Flagsmith.client.get("/api/v1/flags/")
-
       if res.status_code == 200
         flags = Array(Flag).from_json(res.body)
         flags_to_hash(flags)
@@ -49,10 +48,9 @@ class Flagsmith
         raise Error.from_json(res.body, "error")
       end
     else
-      res = Flagsmith.client.get("/api/v1/flags/identities/?identifier=#{user_id}")
+      res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
       if res.status_code == 200
-        flags = Array(Flag).from_json(res.body)
-        flags_to_hash(flags)
+        flags = Flag::FlagList::Trait.from_json(res.body).flags
         flags_to_hash(flags)
       else
         raise Error.from_json(res.body, "error")
@@ -60,7 +58,7 @@ class Flagsmith
     end
   end
 
-  def self.set_trait(user_id, trait, value)
+  def self.set_trait(user_id, trait, value, with_flags = false)
     if user_id.nil?
       return nil
     end
@@ -70,13 +68,17 @@ class Flagsmith
       trait_key:   normalize_key(trait),
       trait_value: value,
     }
-    res = Flagsmith.client.post("/api/v1/traits/", form: trait.to_json)
+    Flagsmith.client.post("/api/v1/traits/", form: trait.to_json)
 
-    if res.status_code == 200
-      traits = Flag::FlagList::Trait.from_json(res.body).traits
-      traits_to_hash(traits)
-    else
-      raise Error.from_json(res.body, "error")
+    if with_flags == true
+      res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
+      if res.status_code == 200
+       flags_with_traits = Flag::FlagList::Trait.from_json(res.body)
+       flags_and_traits_to_hash(flags_with_traits)
+
+      else
+        raise Error.from_json(res.body, "error")
+      end
     end
   end
 
@@ -85,9 +87,12 @@ class Flagsmith
       return nil
     end
     res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
-
-    traits = Flag::FlagList::Trait.from_json(res.body).traits
-    traits_to_hash(traits)
+    if res.status_code == 200
+      traits = Flag::FlagList::Trait.from_json(res.body).traits
+      traits_to_hash(traits)
+    else
+      raise Error.from_json(res.body, "error")
+    end
   end
 
   def self.feature_enabled?(feature, user_id = nil, default = false)
@@ -119,6 +124,19 @@ class Flagsmith
   def self.traits_to_hash(traits)
     result = {} of String => Flagsmith::Trait
     traits.each do |trait|
+      result[trait.trait_key] = trait
+    end
+    result
+  end
+
+  def self.flags_and_traits_to_hash(flags_with_traits)
+    
+    result = {} of String => Flagsmith::Flag | Flagsmith::Trait
+    flags_with_traits.flags.each do |flag|
+      result[flag.feature.name] = flag
+    end
+
+    flags_with_traits.traits.each do |trait|
       result[trait.trait_key] = trait
     end
     result

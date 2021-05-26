@@ -1,13 +1,11 @@
 require "json"
 require "http/client"
 
-
 class Flagsmith
   VERSION = "0.1.0"
 
   class Unset
   end
-
 
   @@api_key : String?
 
@@ -43,12 +41,22 @@ class Flagsmith
   def self.get_flags(user_id = nil) : Hash(String, Flagsmith::Flag)
     if user_id.nil?
       res = Flagsmith.client.get("/api/v1/flags/")
-      flags = Array(Flag).from_json(res.body)
-      flags_to_hash(flags)
+
+      if res.status_code == 200
+        flags = Array(Flag).from_json(res.body)
+        flags_to_hash(flags)
+      else
+        raise Error.from_json(res.body, "error")
+      end
     else
       res = Flagsmith.client.get("/api/v1/flags/identities/?identifier=#{user_id}")
-      flags = Array(Flag).from_json(res.body)
-      flags_to_hash(flags)
+      if res.status_code == 200
+        flags = Array(Flag).from_json(res.body)
+        flags_to_hash(flags)
+        flags_to_hash(flags)
+      else
+        raise Error.from_json(res.body, "error")
+      end
     end
   end
 
@@ -58,38 +66,44 @@ class Flagsmith
     end
 
     trait = {
-        identity:    { identifier: user_id },
-      trait_key:    normalize_key(trait),
-    trait_value:    value
+      identity:    {identifier: user_id},
+      trait_key:   normalize_key(trait),
+      trait_value: value,
     }
     res = Flagsmith.client.post("/api/v1/traits/", form: trait.to_json)
+
+    if res.status_code == 200
+      traits = Flag::FlagList::Trait.from_json(res.body).traits
+      traits_to_hash(traits)
+    else
+      raise Error.from_json(res.body, "error")
+    end
   end
-  
+
   def self.get_traits(user_id)
-     if user_id.nil?
-       return nil
-     end
+    if user_id.nil?
+      return nil
+    end
     res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
 
     traits = Flag::FlagList::Trait.from_json(res.body).traits
     traits_to_hash(traits)
   end
-  
-  
+
   def self.feature_enabled?(feature, user_id = nil, default = false)
     feature_name = normalize_key(feature)
     flag = get_flags(user_id)[feature_name]
     return default if flag.nil?
     flag.enabled
   end
-  
+
   def self.get_value(key, user_id = nil, default = nil)
     key_name = normalize_key(key)
     flag = get_flags(user_id)[key_name]
     return default if flag.nil?
     flag.feature_state_value
   end
-  
+
   def self.normalize_key(key)
     key.to_s.downcase
   end
@@ -109,27 +123,6 @@ class Flagsmith
     end
     result
   end
-
-  # def traits_to_hash(user_flags)
-  #   result = {}
-  #   user_flags['traits']&.each do |t|
-  #     key = normalize_key(t['trait_key'])
-  #     result[key] = t['trait_value']
-  #   end
-  #   result
-  # end
 end
 
-# not needed
-  # def self.transform_flags(flags)
-  #   flags.map do |flag|
-  #     {
-  #          name:    flag["feature"]["name"],
-  #       enabled:    flag["enabled"],
-  #         value:    flag["feature_state_value"],
-  #       segment:    flag["feature_segment"]
-  #     }
-  #   end
-  # end
-  
 require "./flagsmith/**"

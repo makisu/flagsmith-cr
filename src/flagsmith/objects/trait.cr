@@ -5,16 +5,3 @@ class Flagsmith::Trait
   getter trait_key : String
   getter trait_value : Int32
 end
-
-  # "traits": [
-  #   {
-  #     "id": 215352,
-  #     "trait_key": "roles",
-  #     "trait_value": "[\"admin\",\"staff\"]"
-  #   },
-  #   {
-  #     "id": 215988,
-  #     "trait_key": "foo",
-  #     "trait_value": "bar"
-  #   }
-  # ]

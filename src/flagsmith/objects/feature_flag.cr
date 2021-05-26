@@ -8,6 +8,4 @@ class Flagsmith::FeatureFlag
   getter description : String?
   getter default_enabled : Bool
   getter type : String
-
 end
-

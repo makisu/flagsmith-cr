@@ -130,14 +130,14 @@ class Flagsmith
   end
 
   def self.flags_and_traits_to_hash(flags_with_traits)
-    
-    result = {} of String => Flagsmith::Flag | Flagsmith::Trait
+    result = {flags: {} of String => Flagsmith::Flag, traits: {} of String => Flagsmith::Trait}
+
     flags_with_traits.flags.each do |flag|
-      result[flag.feature.name] = flag
+      result[:flags][flag.feature.name] = flag
     end
 
     flags_with_traits.traits.each do |trait|
-      result[trait.trait_key] = trait
+      result[:traits][trait.trait_key] = trait
     end
     result
   end

@@ -16,16 +16,12 @@ Flagsmith.api_key = api_key2
 # end
 test = Flagsmith.set_trait("maria", "font", "arial", true) 
 if test
-    if test["signup_fields"].is_a?(Flagsmith::Flag)
-      puts test["signup_fields"].as(Flagsmith::Flag).id
-      puts test["signup_fields"].as(Flagsmith::Flag).feature_state_value
-    end
+    puts test[:flags]["signup_fields"].id
+    puts test[:flags]["signup_fields"].feature_state_value
 
-   if test["font"].is_a?(Flagsmith::Trait)
-    puts test["font"].as(Flagsmith::Trait).id
-    puts test["font"].as(Flagsmith::Trait).trait_key
-    puts test["font"].as(Flagsmith::Trait).trait_value
-    end
+    puts test[:traits]["font"].id
+    puts test[:traits]["font"].trait_key
+    puts test[:traits]["font"].trait_value
 end
 
 

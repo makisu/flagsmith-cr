@@ -68,17 +68,27 @@ class Flagsmith
       trait_key:   normalize_key(trait),
       trait_value: value,
     }
-    Flagsmith.client.post("/api/v1/traits/", form: trait.to_json)
 
-    if with_flags == true
+    res_post = Flagsmith.client.post("/api/v1/traits/", form: trait.to_json)
+    if res_post.status_code == 200
       res = Flagsmith.client.get("/api/v1/identities/?identifier=#{user_id}")
-      if res.status_code == 200
-       flags_with_traits = Flag::FlagList::Trait.from_json(res.body)
-       flags_and_traits_to_hash(flags_with_traits)
-
+      if with_flags == true
+        if res.status_code == 200
+          flags_with_traits = Flag::FlagList::Trait.from_json(res.body)
+          flags_and_traits_to_tuple(flags_with_traits)
+        else
+          raise Error.from_json(res.body, "error")
+        end
       else
-        raise Error.from_json(res.body, "error")
+        if res.status_code == 200
+          traits = Flag::FlagList::Trait.from_json(res.body)
+          traits_to_tuple(traits)
+        else
+          raise Error.from_json(res.body, "error")
+        end
       end
+    else
+      raise Error.from_json(res_post.body, "error")
     end
   end
 
@@ -129,13 +139,21 @@ class Flagsmith
     result
   end
 
-  def self.flags_and_traits_to_hash(flags_with_traits)
+  def self.flags_and_traits_to_tuple(flags_with_traits)
     result = {flags: {} of String => Flagsmith::Flag, traits: {} of String => Flagsmith::Trait}
 
     flags_with_traits.flags.each do |flag|
       result[:flags][flag.feature.name] = flag
     end
 
+    flags_with_traits.traits.each do |trait|
+      result[:traits][trait.trait_key] = trait
+    end
+    result
+  end
+
+  def self.traits_to_tuple(flags_with_traits)
+    result = {flags: {} of String => Flagsmith::Flag, traits: {} of String => Flagsmith::Trait}
     flags_with_traits.traits.each do |trait|
       result[:traits][trait.trait_key] = trait
     end
